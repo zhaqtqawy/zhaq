@@ -1,4 +1,4 @@
-name: Upload .env to GitHub Secrets (via gh CLI)
+name: Upload .env to GitHub Secrets
 
 on:
   workflow_dispatch:
@@ -7,25 +7,20 @@ jobs:
   upload-secrets:
     runs-on: ubuntu-latest
 
+    env:
+      GH_TOKEN: ${{ secrets.GH_PAT }}
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install GitHub CLI
-        run: |
-          sudo apt update
-          sudo apt install gh -y
-
       - name: Login to GitHub CLI
-        env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
-        run: |
-          echo "$GH_TOKEN" | gh auth login --with-token
+        run: echo "$GH_TOKEN" | gh auth login --with-token
 
-      - name: Upload secrets from .env
+      - name: Upload .env to secrets
         run: |
-          while IFS='=' read -r key value; do
-            if [[ ! "$key" =~ ^# && -n "$key" ]]; then
+          while IFS='=' read -r key value || [[ -n "$key" ]]; do
+            if [[ "$key" != \#* && -n "$key" && -n "$value" ]]; then
               echo "Uploading $key..."
               gh secret set "$key" --body "$value"
             fi
