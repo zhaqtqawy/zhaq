@@ -1,9 +1,7 @@
-name: DrugShift Bot Scheduled Run
+name: DrugShift Bot Manual Run
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'  # كل 5 دقائق
-  workflow_dispatch:
+  workflow_dispatch:  # تشغيل يدوي فقط
 
 jobs:
   run-bot:
